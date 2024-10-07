@@ -83,37 +83,29 @@ void mov(void *src, void *dst, char w) {
     }
 }
 
+/*
+Perform the instruction contained in this line of code.
+
+    `input`: String to be parsed into assembly instruction
+*/
+int parseinst(char **input) {
+
+}
+
 int main(int argc, char **argv) {
 
-    unsigned char m[MEM_SIZE] = {0xE0, 0xEA, 0x64, 0xD4, 0xCE, 0x66, 0x55, 0x7C, 
-                                 0x95, 0x48, 0x78, 0xC3, 0x3F, 0x97, 0x86, 0x39,
-                                 0xBA, 0x88, 0xF3, 0x5F, 0x79, 0x23, 0xF9, 0x52,
-                                 0x13, 0x71, 0xEC, 0x34, 0x61, 0x9A, 0x28, 0xCC,
-                                 0xB1, 0x0F, 0xE3, 0xEF, 0x5E, 0x9F, 0x0C, 0xF8,
-                                 0x7D, 0xDB, 0x16, 0x24, 0x2C, 0x8E, 0xAE, 0xCF}; // sample data for memory
-    for (int i = 0; i < 48; i++)
-        mem[i] = m[i];
+    if (argc < 2) {
+        // "Interactive" mode. WIP
+        assert(0 && "Interactive mode not implemented :(");
+    } else {
+        // Read from file
+        FILE *file;
+        file = fopen(argv[1], "r");
 
-    rax = 0x0000000000000008;
-    rcx = 0x0000000000000003;
-    rdx = 0xffffffffffffffff;
 
-    memdump(3, 8);
-    regdump(0b1101);
-    printf("\n");
-    
-    mov(&ref(0,rax,rcx,1), &rdx, 'b'); // movb (%rax, %rcx), %rdx
-    regdump(0b1000);
-    mov(&ref(0,rax,rcx,1), &rdx, 'w'); // movw (%rax, %rcx), %rdx
-    regdump(0b1000);
-    mov(&ref(0,rax,rcx,1), &rdx, 'l'); // movl (%rax, %rcx), %rdx
-    regdump(0b1000);
-    mov(&ref(0,rax,rcx,1), &rdx, 'q'); // movq (%rax, %rcx), %rdx
-    regdump(0b1000);
 
-    long s = ~0ll;
-    mov(&s, &ref(2,0,rcx,3), 'l');     // movl $0xffffffff, 2(,%rcx,3)
-    memdump(3, 8);
+        fclose(file);
+    }
 
 }
 

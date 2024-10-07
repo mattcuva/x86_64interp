@@ -9,6 +9,10 @@
 !/**/
 !*.*
 
+# files for testing
+*.txt
+*.asm
+
 # Below is from https://github.com/github/gitignore/blob/main/C.gitignore
 
 # Prerequisites
