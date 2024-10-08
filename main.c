@@ -88,7 +88,7 @@ Perform the instruction contained in this line of code.
 
     `input`: String to be parsed into assembly instruction
 */
-int parseinst(char **input) {
+int parseinst(char *input) {
 
 }
 
@@ -102,7 +102,12 @@ int main(int argc, char **argv) {
         FILE *file;
         file = fopen(argv[1], "r");
 
+        char line[512];
 
+        while (fgets(line, sizeof(line), file)) {
+           parseinst(line);
+           printf("%s", line);
+        }
 
         fclose(file);
     }
