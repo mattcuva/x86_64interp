@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <assert.h>
+#include <ctype.h>
+#include <string.h>
 
 unsigned long long registers[16]; // Registers inside CPU
 // Register reference shortcuts
@@ -83,34 +85,81 @@ void mov(void *src, void *dst, char w) {
     }
 }
 
-/*
-Perform the instruction contained in this line of code.
+// Sets `*cur` to index of next non-whitespace character starting from `next`
+void nextnonws(char *input, int *cur) {
+    while (input[*cur] != '\0' && isspace(input[*cur]))
+        (*cur)++;
+}
 
-    `input`: String to be parsed into assembly instruction
-*/
-int parseinst(char *input) {
+#define NUM_INST 5
+char *inststrings[NUM_INST] = {"movb", "movw", "movl", "movq", "mov"};
+
+// Determine the instruction on this line (if known)
+int getinst(char *line, int *cur) {
+    for (int i = 0; i < NUM_INST; i++) {
+        int instlen = strlen(inststrings[i]);
+        if (memcmp(inststrings[i], line+*cur, instlen) == 0) {
+            (*cur) += instlen;
+            return i;
+        }
+    }
+    return -1; // instruction not found
+}
+
+char *regstrings[8] = {"rax", "rbx", "rcx", "rdc", "rsi", "rdi", "rbp", "rsp"};
+
+// Determine what address the next operand refers to
+void* getoperand(char *line, int *cur) {
+    if (strlen(line+*cur)) return NULL;
+    char c = *(line+*cur);
+    if (c == '%') {
+        // register
+        for (int i = 0; i < NUM_INST; i++) {
+            int reglen = strlen(regstrings[i]);
+            if (memcmp(regstrings[i], line+*cur, reglen) == 0) {
+                (*cur) += reglen;
+                printf("%s\n", regstrings[i]);
+                break;
+            }
+        }
+        
+    } else if (c == '$') {
+        // a literal number
+
+    } else {
+        // address
+
+    }
+    return NULL;
+}
+
+void parseinst(char *line) {
+    int cg = 0;
+    int sl = strlen(line);
+    nextnonws(line, &cg); // move to instruction
+    if (cg == sl) return; // blank line
+
+    int inst = getinst(line, &cg); // determine instruction
+    if (inst < 0) {
+        printf("Unrecognized instruction: %s\n", line);
+        return;
+    }
+
+    printf("%s\n", inststrings[inst]);
 
 }
 
 int main(int argc, char **argv) {
 
-    if (argc < 2) {
-        // "Interactive" mode. WIP
-        assert(0 && "Interactive mode not implemented :(");
-    } else {
-        // Read from file
-        FILE *file;
-        file = fopen(argv[1], "r");
+    FILE *file;
+    file = fopen(argv[1], "r");
+    char line[256];
 
-        char line[512];
-
-        while (fgets(line, sizeof(line), file)) {
-           parseinst(line);
-           printf("%s", line);
-        }
-
-        fclose(file);
+    while (fgets(line, sizeof(line), file)) {
+        parseinst(line);
     }
+
+    fclose(file);
 
 }
 
